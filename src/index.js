@@ -18,15 +18,7 @@ const filter = {
 };
 let userInputCountry = '';
 
-function inputText(e) {
-  userInputCountry = e.target.value;
-  if (e.target.value == '') {
-    clearMarkup();
-    return;
-  }
-  if (refs.countryInfo.hasChildNodes() || refs.countryList.hasChildNodes()) {
-    clearMarkup();
-  }
+function renderFetchCountries() {
   fetchCountries(userInputCountry, filter)
     .then(response => {
       if (response.ok) {
@@ -58,6 +50,7 @@ function inputText(e) {
       }
     });
 }
+
 function createListMarkup(countries) {
   let countryString = '';
   countries.forEach(country => {
@@ -102,4 +95,17 @@ function clearMarkup() {
   refs.countryInfo.replaceChildren();
   refs.countryList.replaceChildren();
 }
-refs.countryInput.addEventListener(`input`, debounce(inputText, 300));
+refs.countryInput.addEventListener(
+  `input`,
+  debounce(e => {
+    userInputCountry = e.target.value.trim();
+    if (e.target.value == '') {
+      clearMarkup();
+      return;
+    }
+    if (refs.countryInfo.hasChildNodes() || refs.countryList.hasChildNodes()) {
+      clearMarkup();
+    }
+    if (userInputCountry !== '') renderFetchCountries();
+  }, DEBOUNCE_DELAY)
+);
